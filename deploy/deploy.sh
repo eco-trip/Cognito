@@ -29,11 +29,12 @@ if [ "$env" = "dev" ]; then
 	CognitoUserPoolID=$(aws cloudformation describe-stacks --stack-name ${URI} --query "Stacks[0].Outputs[?OutputKey=='CognitoUserPoolID'].OutputValue" --output text)
 	CognitoAppClientID=$(aws cloudformation describe-stacks --stack-name ${URI} --query "Stacks[0].Outputs[?OutputKey=='CognitoAppClientID'].OutputValue" --output text)
 
-	cp ../Administration/.env ../Administration/.env.dev
-	echo "" >>../Administration/.env.dev
-	echo "AWS_COGNITO_URL=${CognitoDomainUrl}" >>../Administration/.env.dev
-	echo "AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>../Administration/.env.dev
-	echo "AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>../Administration/.env.dev
+	administration_path=../../Administration/
+	cp ${administration_path}.env ${administration_path}.env.dev
+	echo "" >>${administration_path}.env.dev
+	echo "AWS_COGNITO_URL=${CognitoDomainUrl}" >>${administration_path}.env.dev
+	echo "AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${administration_path}.env.dev
+	echo "AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${administration_path}.env.dev
 else
 	CognitoUrl=${AuthUrl}
 
