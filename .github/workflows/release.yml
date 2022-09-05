@@ -1,0 +1,26 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - release
+      - staging
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Semantic Release
+        uses: eco-trip/semantic-release-action@v1.0
+        with:
+          token: ${{ secrets.MEBBOT }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        uses: eco-trip/ci-deploy-action@v1.0
+        with:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          token: ${{ secrets.MEBBOT }}
