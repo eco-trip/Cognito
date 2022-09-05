@@ -15,3 +15,11 @@ Else create cognito with custom domain name and dns record set
 
 - [staging] auth.staging.ecotrip.meblabs.dev
 - [production] auth.ecotrip.meblabs.dev
+
+## Seed
+
+To seed admin@meblabs.com as verified user into Cognito User Pool:
+
+```sh
+cd deploy && bash seed.sh -e [ENV]
+```
