@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  Url:
+    Type: String
+    Description: The cognito custom domain
+  CognitoCFD:
+    Type: String
+    Description: The cognito CloudFront Distribution alias
+  HostedZoneId:
+    Description: Hosted zone Id on route 53
+    Type: String
+
+Resources:
+  RecordSetGroup:
+    Type: "AWS::Route53::RecordSetGroup"
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      RecordSets:
+        - AliasTarget:
+            DNSName: !Ref CognitoCFD
+            EvaluateTargetHealth: "false"
+            HostedZoneId: Z2FDTNDATAQYW2
+          Name: !Ref Url
+          Type: A
