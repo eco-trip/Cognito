@@ -1,6 +1,6 @@
 {
   "name": "cognito",
-  "version": "0.0.0",
+  "version": "1.0.0-staging.1",
   "author": "Matteo Brocca, Alan Mancini, Alberto Marfoglia",
   "description": "Cognito AWS infrastructure for Ecotrip",
   "devDependencies": {
