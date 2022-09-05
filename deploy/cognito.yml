@@ -45,7 +45,7 @@ Resources:
           AttributeDataType: String
           Mutable: true
           Required: true
-        - Name: phone
+        - Name: phone_number
           AttributeDataType: String
           Mutable: true
           Required: false
