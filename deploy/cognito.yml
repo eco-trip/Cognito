@@ -57,6 +57,10 @@ Resources:
           AttributeDataType: Number
           Mutable: true
           Required: false
+        - Name: role
+          AttributeDataType: String
+          Mutable: true
+          Required: false
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
