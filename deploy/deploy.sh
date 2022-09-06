@@ -68,6 +68,6 @@ else
 		--disable-rollback \
 		--resolve-s3 \
 		--parameter-overrides ${Parameters} \
-		--capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND
-	--tags project=${Project} env=${Env} creator=${GitUsername}
+		--capabilities CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND \
+		--tags project=${Project} env=${Env} creator=${GitUsername}
 fi
