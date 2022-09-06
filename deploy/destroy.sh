@@ -9,7 +9,7 @@ fi
 # LOAD PARAMETERS
 source parameters
 
-if [ "$env" = "production" ]; then
+if [ "$Env" = "production" ]; then
 	read -p "Are you sure? " -n 1 -r
 	echo
 	echo
@@ -18,19 +18,29 @@ if [ "$env" = "production" ]; then
 	fi
 fi
 
-# GET URL FROM S3 AND SET VARIABLES
-aws s3 cp ${urls} ./urls.json
-
 # COGNITO
-if [ "$env" != "dev" ]; then
+if [ "$Env" != "dev" ]; then
 	# destroy cognito dns if not dev env
 	CognitoDnsURI=${URI}-dns
-	sam delete --stack-name ${CognitoDnsURI} --no-prompts --region ${AWS_DEFAULT_REGION} --profile ${AWS_PROFILE}
+	sam delete \
+		--stack-name ${CognitoDnsURI} \
+		--no-prompts \
+		--region ${AWS_DEFAULT_REGION} \
+		--profile ${AWS_PROFILE}
 
 	# manual delete user pool custom domain before remove cognito
-	AuthUrl=$(cat urls.json | jq ".auth.${env}" | tr -d '"')
+	aws s3 cp ${Urls} ./urls.json
+	AuthUrl=$(cat urls.json | jq ".auth.${Env}" | tr -d '"')
 	UserPoolId=$(aws cognito-idp describe-user-pool-domain --domain ${AuthUrl} --region ${AWS_DEFAULT_REGION} --profile ${AWS_PROFILE} | jq -r '.DomainDescription.UserPoolId')
-	aws cognito-idp delete-user-pool-domain --domain ${AuthUrl} --user-pool-id ${UserPoolId} --region ${AWS_DEFAULT_REGION} --profile ${AWS_PROFILE}
+	aws cognito-idp delete-user-pool-domain \
+		--domain ${AuthUrl} \
+		--user-pool-id ${UserPoolId} \
+		--region ${AWS_DEFAULT_REGION} \
+		--profile ${AWS_PROFILE}
 fi
 
-sam delete --stack-name ${URI} --no-prompts --region ${AWS_DEFAULT_REGION} --profile ${AWS_PROFILE}
+sam delete \
+	--stack-name ${URI} \
+	--no-prompts \
+	--region ${AWS_DEFAULT_REGION} \
+	--profile ${AWS_PROFILE}

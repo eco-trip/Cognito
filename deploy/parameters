@@ -1,32 +1,27 @@
 #!/bin/bash
 
-# LOAD EXTERNAL VARIABLES FOR LOCAL EXEC
 source ../.env
 
-while getopts ":hSe:p:l:t:a:g:d:s:" opt; do
+# SET USEFULL VAR
+RootFolder=$(dirname $(pwd))
+GitUsername=$(echo $(git config user.name) | tr '[:upper:]' '[:lower:]')
+
+while getopts ":h:e:t:a:r:" opt; do
 	case $opt in
 	h)
 		echo "This script generates the cloud structure needed.
     Flags:
-      -e  Specify the env [production, staging]
-      -p  Specify the project name
+      -e  Specify the env [dev, production, staging]
 			-t  Specify the target name of application
-			-g  Specify the creator of the resource [default git username]
-      -a  Specify the aws profile to use
-			-r  Specify the aws default region"
+      -a  Specify the aws profile to use [optional]
+			-r  Specify the aws default region [optional]"
 		exit
 		;;
 	e)
-		env="$OPTARG"
-		;;
-	p)
-		project="$OPTARG"
+		Env="$OPTARG"
 		;;
 	t)
-		target="$OPTARG"
-		;;
-	g)
-		git_username="$OPTARG"
+		Target="$OPTARG"
 		;;
 	a)
 		AWS_PROFILE="$OPTARG"
@@ -40,17 +35,12 @@ while getopts ":hSe:p:l:t:a:g:d:s:" opt; do
 	esac
 done
 
-if [ "$env" = "" ]; then
+if [ "$Env" = "" ]; then
 	echo "No env specified, use -e to select the environment"
 	exit 2
 fi
 
-if [ "$project" = "" ]; then
-	echo "Specify the project name with the -p flag"
-	exit 2
-fi
-
-if [ "$target" = "" ]; then
+if [ "$Target" = "" ]; then
 	echo "Specify the target name of application with the -t flag"
 	exit 2
 fi
@@ -63,13 +53,24 @@ export AWS_PAGER=""
 echo "AWS_PROFILE: ${AWS_PROFILE}"
 echo "AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}"
 
-# SET USEFULL VAR
-root_folder=$(dirname $(pwd))
-git_username=$(echo $(git config user.name) | tr '[:upper:]' '[:lower:]')
+# GET SECTRETS
+Secrets=$(aws secretsmanager get-secret-value --secret-id ${AWS_SECRETS} --cli-connect-timeout 1)
+Urls=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.Urls')
+Project=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.Project')
+
+if [ "$Urls" = "" ]; then
+	echo "Urls not specified in AWS secrets"
+	exit 2
+fi
+
+if [ "$Project" = "" ]; then
+	echo "Progect not specified in AWS secrets"
+	exit 2
+fi
 
 # SET URI FOR STACK NAME
-if [ $env = "dev" ]; then
-	URI="${project}"-"${env}"-"${git_username}"-"${target}"
+if [ $Env = "dev" ]; then
+	URI="${Project}"-"${Env}"-"${GitUsername}"-"${Target}"
 else
-	URI="${project}"-"${env}"-"${target}"
+	URI="${Project}"-"${Env}"-"${Target}"
 fi
