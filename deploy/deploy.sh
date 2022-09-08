@@ -35,11 +35,17 @@ if [ "$Env" = "dev" ]; then
 	CognitoAppClientID=$(aws cloudformation describe-stacks --stack-name ${URI} --query "Stacks[0].Outputs[?OutputKey=='CognitoAppClientID'].OutputValue" --output text)
 
 	AdministrationPath=../../Administration/
-	cp ${AdministrationPath}.env ${AdministrationPath}.env.dev
-	echo "" >>${AdministrationPath}.env.dev
-	echo "AWS_COGNITO_URL=${CognitoDomainUrl}" >>${AdministrationPath}.env.dev
-	echo "AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${AdministrationPath}.env.dev
-	echo "AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${AdministrationPath}.env.dev
+	cp ${AdministrationPath}.env ${AdministrationPath}.env.development
+	echo "" >>${AdministrationPath}.env.development
+	echo "AWS_COGNITO_URL=${CognitoDomainUrl}" >>${AdministrationPath}.env.development
+	echo "AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${AdministrationPath}.env.development
+	echo "AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${AdministrationPath}.env.development
+
+	CpPath=../../CP/
+	echo "" >>${CpPath}.env.local
+	echo "REACT_APP_AWS_COGNITO_URL=${CognitoDomainUrl}" >>${CpPath}.env.local
+	echo "REACT_APP_AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${CpPath}.env.local
+	echo "REACT_APP_AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${CpPath}.env.local
 else
 	CognitoUrl=${AuthUrl}
 
