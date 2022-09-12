@@ -67,6 +67,13 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Retain
     Properties:
+      AccessTokenValidity: 5
+      IdTokenValidity: 5
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: minutes
+        IdToken: minutes
+        RefreshToken: days
       ClientName: !Sub ${URI}-user-client
       UserPoolId: !Ref UserPool
 
