@@ -62,7 +62,7 @@ else
 		--tags project=${Project} env=${Env} creator=${GitUsername}
 
 	#get cloudfront distribution for cognito custom domain (in cloud formation can't retrive it)
-	CognitoCFD=$(aws cognito-idp describe-user-pool-domain --domain ${CognitoUrl} --region ${AWS_DEFAULT_REGION} --profile ${AWS_PROFILE} | jq -r '.DomainDescription.CloudFrontDistribution')
+	CognitoCFD=$(aws cognito-idp describe-user-pool-domain --domain ${CognitoUrl} | jq -r '.DomainDescription.CloudFrontDistribution')
 	CognitoDnsURI=${URI}-dns
 
 	#create dns record for cognito custom domain

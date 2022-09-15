@@ -25,8 +25,7 @@ if [ "$Env" != "dev" ]; then
 	sam delete \
 		--stack-name ${CognitoDnsURI} \
 		--no-prompts \
-		--region ${AWS_DEFAULT_REGION} \
-		--profile ${AWS_PROFILE}
+		--region ${AWS_DEFAULT_REGION}
 
 	# manual delete user pool custom domain before remove cognito
 	aws s3 cp ${Urls} ./urls.json
@@ -42,5 +41,4 @@ fi
 sam delete \
 	--stack-name ${URI} \
 	--no-prompts \
-	--region ${AWS_DEFAULT_REGION} \
-	--profile ${AWS_PROFILE}
+	--region ${AWS_DEFAULT_REGION}
