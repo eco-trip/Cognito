@@ -11,13 +11,6 @@ Parameters:
   SesArn:
     Type: String
     Description: The ARN of Simple email service (SES)
-  AcmArn:
-    Type: String
-    Description: The ARN of the ssl certificate genereted on ACM
-    Default: ""
-
-Conditions:
-  CustomDomain: !Not [!Equals [!Ref AcmArn, ""]]
 
 Resources:
   UserPool:
@@ -82,10 +75,6 @@ Resources:
     Properties:
       Domain: !Ref Url
       UserPoolId: !Ref UserPool
-      CustomDomainConfig: !If
-        - CustomDomain
-        - CertificateArn: !Ref AcmArn
-        - !Ref AWS::NoValue
 
 Outputs:
   CognitoUserPoolID:
