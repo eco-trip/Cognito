@@ -36,6 +36,8 @@ if [ "$Env" = "dev" ]; then
 	AdministrationPath=../../Administration/
 	cp ${AdministrationPath}.env ${AdministrationPath}.env.development
 	echo "" >>${AdministrationPath}.env.development
+	echo "Project=${Project}" >>${AdministrationPath}.env.development
+	echo "" >>${AdministrationPath}.env.development
 	echo "AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${AdministrationPath}.env.development
 	echo "AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${AdministrationPath}.env.development
 
