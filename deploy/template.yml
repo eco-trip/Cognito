@@ -54,6 +54,10 @@ Resources:
           AttributeDataType: String
           Mutable: true
           Required: false
+        - Name: hotelId
+          AttributeDataType: String
+          Mutable: true
+          Required: false
 
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
