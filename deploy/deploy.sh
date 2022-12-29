@@ -9,6 +9,8 @@ trap "echo; echo \"DELETING THE STACK\"; bash destroy.sh -e ${Env} -p ${Project}
 AcmArn=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.AcmArn')
 SesArn=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.SesArn')
 HostedZoneId=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.HostedZoneId')
+AWS_ACCESS_KEY_ID=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.AWS_SECRET_ACCESS_KEY')
 
 # GET URL FROM S3 AND SET VARIABLES
 aws s3 cp ${Urls} ./urls.json
@@ -40,6 +42,8 @@ if [ "$Env" = "dev" ]; then
 	echo "" >>${AdministrationPath}.env.development
 	echo "AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${AdministrationPath}.env.development
 	echo "AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${AdministrationPath}.env.development
+	echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >>${AdministrationPath}.env.development
+	echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >>${AdministrationPath}.env.development
 
 	CpPath=../../CP/
 	echo "" >>${CpPath}.env.local
