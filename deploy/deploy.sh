@@ -36,14 +36,9 @@ if [ "$Env" = "dev" ]; then
 	CognitoAppClientID=$(aws cloudformation describe-stacks --stack-name ${URI} --query "Stacks[0].Outputs[?OutputKey=='CognitoAppClientID'].OutputValue" --output text)
 
 	AdministrationPath=../../Administration/
-	cp ${AdministrationPath}.env ${AdministrationPath}.env.development
-	echo "" >>${AdministrationPath}.env.development
-	echo "Project=${Project}" >>${AdministrationPath}.env.development
 	echo "" >>${AdministrationPath}.env.development
 	echo "AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${AdministrationPath}.env.development
 	echo "AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${AdministrationPath}.env.development
-	echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}" >>${AdministrationPath}.env.development
-	echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >>${AdministrationPath}.env.development
 
 	CpPath=../../CP/
 	echo "" >>${CpPath}.env.local
