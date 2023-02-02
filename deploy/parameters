@@ -1,0 +1,76 @@
+#!/bin/bash
+
+source ../.env
+
+# SET USEFULL VAR
+RootFolder=$(dirname $(pwd))
+GitUsername=$(echo $(git config user.name) | tr '[:upper:]' '[:lower:]')
+
+while getopts ":h:e:t:a:r:" opt; do
+	case $opt in
+	h)
+		echo "This script generates the cloud structure needed.
+    Flags:
+      -e  Specify the env [dev, production, staging]
+			-t  Specify the target name of application
+      -a  Specify the aws profile to use [optional]
+			-r  Specify the aws default region [optional]"
+		exit
+		;;
+	e)
+		Env="$OPTARG"
+		;;
+	t)
+		Target="$OPTARG"
+		;;
+	a)
+		AWS_PROFILE="$OPTARG"
+		;;
+	r)
+		AWS_DEFAULT_REGION="$OPTARG"
+		;;
+	\?)
+		echo "Invalid option: -$OPTARG"
+		;;
+	esac
+done
+
+if [ "$Env" = "" ]; then
+	echo "No env specified, use -e to select the environment"
+	exit 2
+fi
+
+if [ "$Target" = "" ]; then
+	echo "Specify the target name of application with the -t flag"
+	exit 2
+fi
+
+# SET AWS REGION, PROFILE AND THE WAY THE RESPONSES ARE SHOWN FOR ALL COMMANDS
+export AWS_PROFILE=$AWS_PROFILE
+export AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION
+export AWS_PAGER=""
+
+echo "AWS_PROFILE: ${AWS_PROFILE}"
+echo "AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}"
+
+# GET SECTRETS
+Secrets=$(aws secretsmanager get-secret-value --secret-id ${AWS_SECRETS} --cli-connect-timeout 1)
+Urls=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.Urls')
+Project=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.Project')
+
+if [ "$Urls" = "" ]; then
+	echo "Urls not specified in AWS secrets"
+	exit 2
+fi
+
+if [ "$Project" = "" ]; then
+	echo "Progect not specified in AWS secrets"
+	exit 2
+fi
+
+# SET URI FOR STACK NAME
+if [ $Env = "dev" ]; then
+	URI="${Project}"-"${Env}"-"${GitUsername}"-"${Target}"
+else
+	URI="${Project}"-"${Env}"-"${Target}"
+fi
