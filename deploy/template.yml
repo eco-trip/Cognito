@@ -108,10 +108,28 @@ Resources:
             - UserPoolIoT
             - ProviderName
 
+  IoTDataPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${URI}-free-access-policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "iot:Subscribe"
+              - "iot:Connect"
+            Effect: Allow
+            Resource: "arn:aws:iot:*:030800513199:topicfilter/ecotrip"
+      Roles:
+        - !Ref IoTDataRole
+
   IoTDataRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: !Sub ${URI}-free-access-role
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSIoTConfigAccess
+        - arn:aws:iam::aws:policy/AWSIoTDataAccess
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -125,17 +143,6 @@ Resources:
                 "cognito-identity.amazonaws.com:aud": !Ref IdentityPoolIot
               ForAnyValue:StringLike:
                 "cognito-identity.amazonaws.com:amr": "unauthenticated"
-
-      Policies:
-        - PolicyName: !Sub ${URI}-free-access-policy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Action:
-                  - "iot:Publish"
-                  - "iot:Subscribe"
-                Effect: Allow
-                Resource: "*"
 
   IoTDataPolicyAttachment:
     Type: AWS::Cognito::IdentityPoolRoleAttachment
