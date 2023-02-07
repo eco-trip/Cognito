@@ -80,10 +80,92 @@ Resources:
       Domain: !Ref Url
       UserPoolId: !Ref UserPool
 
+  UserPoolIoT:
+    Type: AWS::Cognito::UserPool
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      UserPoolName: !Sub ${URI}-user-pool-iot
+      AutoVerifiedAttributes:
+        - email
+
+  UserPoolClientIot:
+    Type: AWS::Cognito::UserPoolClient
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Retain
+    Properties:
+      ClientName: !Sub ${URI}-user-client-iot
+      UserPoolId: !Ref UserPoolIoT
+
+  IdentityPoolIot:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      IdentityPoolName: !Sub ${URI}-identity-pool-iot
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId: !Ref UserPoolClientIot
+          ProviderName: !GetAtt
+            - UserPoolIoT
+            - ProviderName
+
+  IoTDataPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub ${URI}-free-access-policy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "iot:Subscribe"
+              - "iot:Connect"
+            Effect: Allow
+            Resource: "arn:aws:iot:*:030800513199:topicfilter/ecotrip"
+      Roles:
+        - !Ref IoTDataRole
+
+  IoTDataRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${URI}-free-access-role
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSIoTConfigAccess
+        - arn:aws:iam::aws:policy/AWSIoTDataAccess
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action:
+              - "sts:AssumeRoleWithWebIdentity"
+            Effect: Allow
+            Principal:
+              Federated: "cognito-identity.amazonaws.com"
+            Condition:
+              StringEquals:
+                "cognito-identity.amazonaws.com:aud": !Ref IdentityPoolIot
+              ForAnyValue:StringLike:
+                "cognito-identity.amazonaws.com:amr": "unauthenticated"
+
+  IoTDataPolicyAttachment:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPoolIot
+      Roles:
+        unauthenticated: !GetAtt
+          - IoTDataRole
+          - Arn
+
 Outputs:
   CognitoUserPoolID:
     Value: !Ref UserPool
     Description: The UserPool ID
   CognitoAppClientID:
     Value: !Ref UserPoolClient
-    Description: The app client
+    Description: The App Client
+  UserPoolIoT:
+    Value: !Ref UserPoolIoT
+    Description: The IoT UserPool ID
+  UserPoolClientIot:
+    Value: !Ref UserPoolClientIot
+    Description: The Iot app client ID
+  IdentityPoolIot:
+    Value: !Ref IdentityPoolIot
+    Description: The IoT Identity ID

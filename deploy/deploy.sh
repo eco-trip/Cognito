@@ -45,8 +45,16 @@ if [ "$Env" = "dev" ]; then
 	echo "REACT_APP_AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${CpPath}.env.local
 	echo "REACT_APP_AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${CpPath}.env.local
 
+	UserPoolIoT=$(aws cloudformation describe-stacks --stack-name ${URI} --query "Stacks[0].Outputs[?OutputKey=='UserPoolIoT'].OutputValue" --output text)
+	UserPoolClientIot=$(aws cloudformation describe-stacks --stack-name ${URI} --query "Stacks[0].Outputs[?OutputKey=='UserPoolClientIot'].OutputValue" --output text)
+	IdentityPoolIot=$(aws cloudformation describe-stacks --stack-name ${URI} --query "Stacks[0].Outputs[?OutputKey=='IdentityPoolIot'].OutputValue" --output text)
+	MQTT_ID=$(echo ${Secrets} | jq .SecretString | jq -rc . | jq -rc '.MQTT_ID')
+
 	AppPath=../../App/
 	echo "" >>${AppPath}.env.local
-	echo "REACT_APP_AWS_COGNITO_USER_POOL_ID=${CognitoUserPoolID}" >>${AppPath}.env.local
-	echo "REACT_APP_AWS_COGNITO_CLIENT_ID=${CognitoAppClientID}" >>${AppPath}.env.local
+	echo "REACT_APP_AWS_COGNITO_USER_POOL_ID=${UserPoolIoT}" >>${AppPath}.env.local
+	echo "REACT_APP_AWS_COGNITO_CLIENT_ID=${UserPoolClientIot}" >>${AppPath}.env.local
+	echo "REACT_APP_AWS_IDENTITY_POOL_ID=${IdentityPoolIot}" >>${AppPath}.env.local
+	echo "REACT_APP_MQTT_ID=${MQTT_ID}" >>${AppPath}.env.local
+	echo "REACT_APP_AWS_REGION=${AWS_DEFAULT_REGION}" >>${AppPath}.env.local
 fi
